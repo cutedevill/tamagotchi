@@ -8,8 +8,7 @@ namespace tamagotchi
         static void Main()
         {
             uint action;
-            bool selected = false;
-            bool game = true;
+            bool selected = false, game = true;
             Pet pet = new Pet();
 
             Console.Write("################################################################################\n" +
@@ -34,12 +33,29 @@ namespace tamagotchi
                                 "####### Please enter pet's name ################################################\n" +
                                 "################################################################################\n\n\t");
                             pet.Stat_Change(Console.ReadLine());
+                            pet.Game_Log(0);
+                            pet.Last_Save(1);
                             selected = true;
                             break;
                         case 2:
                             Console.Clear();
-                            Console.WriteLine("\nPlease enter pet's name 2\n"); ///
-                            pet.Stat_Change(Console.ReadLine());
+                            bool finded = false;
+                            do
+                            {
+                                Console.Write("################################################################################\n" +
+                                    "####### Please enter pet's name ################################################\n" +
+                                    "################################################################################\n\n\t");
+                                pet.Stat_Change(Console.ReadLine());
+                                if (pet.Last_Save(0))
+                                    finded = true;
+                                else
+                                {
+                                    Console.Write("Cann't find pet with this nsme. Please press any key to continue\n\n\t");
+                                    Console.ReadKey();
+                                    Console.Clear();
+                                }                                
+                            } while (!finded);
+                            pet.Last_Save(2);
                             selected = true;
                             break;
                         case 3:
@@ -58,6 +74,7 @@ namespace tamagotchi
 
                 do
                 {
+                    pet.Last_Save(1);
                     Console.Clear();
                     Console.WriteLine(pet.Output());
                     Console.Write("\tSelect action: \n\t1. Feed\n\t2. Sleep\n\t3. Play\n\t4. Heal\n\t5.Exit\n\n\t");
@@ -69,21 +86,25 @@ namespace tamagotchi
                             Console.Clear();
                             pet.Feed();
                             pet.Output();
+                            pet.Game_Log(1);
                             break;
                         case 2:
                             Console.Clear();
                             pet.Sleep();
                             pet.Output();
+                            pet.Game_Log(2);
                             break;
                         case 3:
                             Console.Clear();
                             pet.Play();
                             pet.Output();
+                            pet.Game_Log(3);
                             break;
                         case 4:
                             Console.Clear();
                             pet.Heal();
                             pet.Output();
+                            pet.Game_Log(4);
                             break;
                         case 5:
                             Console.Clear();
@@ -94,13 +115,14 @@ namespace tamagotchi
                         default:
                             Console.WriteLine("\tWrong value. Please press any key to continue");
                             Console.ReadKey();
-                            //System.Threading.Thread.Sleep(5000); 
                             break;
                     }
                 } while (!pet.Game_Over());
 
                 Console.Write("################################################################################\n" +
-                   "##############################  Your pet is dead. ##############################\n");
+                   "##############################  Your pet has dead. ##############################\n");
+                pet.Game_Log(5);
+
             } while (game);
         }
     }

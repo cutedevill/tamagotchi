@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace tamagotchi
@@ -95,12 +97,12 @@ namespace tamagotchi
         #endregion
 
         #region output
-        public string Stat_Output(uint stat)
+        public string State_Output(uint state)
         {
             string Out = "";
-            for (uint i = 0; i < stat; i++)
+            for (uint i = 0; i < state; i++)
                 Out += "+";
-            for (uint i = stat; i < 10; i++)
+            for (uint i = state; i < 10; i++)
                 Out += "_";
             return Out;
         }
@@ -115,14 +117,71 @@ namespace tamagotchi
             for (int i = ((80 - name.Length) / 2 + 2 + name.Length); i <= 80; i++)
                 Out += "#";
             Out += "\n################################################################################\n" + 
-                $"####### HEALTH {Stat_Output(health)}    ###################################################" +
-                $"\n####### HANGER {Stat_Output(hunger)}    ###################################################" +
-                $"\n####### TIREDNESS {Stat_Output(tiredness)} ###################################################" +
+                $"####### HEALTH {State_Output(health)}    ###################################################" +
+                $"\n####### HUNGER {State_Output(hunger)}    ###################################################" +
+                $"\n####### TIREDNESS {State_Output(tiredness)} ###################################################" +
                 "\n################################################################################\n";
             return Out;
         }
         #endregion
 
-       // public void
+
+        public void Game_Log(byte option)
+        {
+            string prepath = @$"{AppDomain.CurrentDomain.BaseDirectory}\\..\\..\\..";
+            string path = @$"{prepath}\{name}'s_log.txt";
+            switch (option)
+            {
+                case 0:
+                    File.WriteAllText(path, $"\n\t\t\tHere saved the {name}'s game log" +
+                        $"\n\n\tAction\t\tHealth\t\t  HUnger\t   Tiredness" +
+                        $"\n---------------------------------------------------------------------------" +
+                        $"\n\tInitial state {State_Output(health)}\t{State_Output(hunger)}\t   {State_Output(tiredness)}" );
+                    break;
+                case 1:
+                    File.AppendAllText(path, $"\n\n\tFeed\t      {State_Output(health)}\t{State_Output(hunger)}\t   {State_Output(tiredness)}");
+                    break;
+                case 2:
+                    File.AppendAllText(path, $"\n\n\tSleep\t      {State_Output(health)}\t{State_Output(hunger)}\t   {State_Output(tiredness)}");
+                    break;
+                case 3:
+                    File.AppendAllText(path, $"\n\n\tPlay\t      {State_Output(health)}\t{State_Output(hunger)}\t   {State_Output(tiredness)}");
+                    break;
+                case 4:
+                    File.AppendAllText(path, $"\n\n\tHeal\t      {State_Output(health)}\t{State_Output(hunger)}\t   {State_Output(tiredness)}");
+                    break;
+                case 5:
+                    File.AppendAllText(path, "\n\t\t\tYour pet has dead.");
+                    break;
+
+            }
+        }
+
+        public bool Last_Save(byte option)
+        {
+            string prepath = @$"{AppDomain.CurrentDomain.BaseDirectory}\\..\\..\\..";
+            string path = @$"{Path.Combine(prepath)}\{name}'s_last_save.txt";
+            switch (option)
+            {
+                case 0:
+                    if (!File.Exists(path))
+                        return false;
+                     return true;
+                case 1:
+                    File.WriteAllText(path, $"{health} {hunger} {tiredness}");
+                    return true;
+                case 2:
+                    StreamReader file = new StreamReader(path);
+                    string values = file.ReadLine();
+                    file.Close();
+                    var uints = values.Split(' ').Select(UInt32.Parse).ToArray();
+                    health = uints[0];
+                    hunger = uints[1];
+                    tiredness = uints[2];
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 } 

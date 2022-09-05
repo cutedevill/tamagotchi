@@ -94,7 +94,7 @@ namespace tamagotchi
                         default:
                             Console.WriteLine("\tWrong value. Please press any key to continue");
                             Console.ReadKey();
-                            //System.Threading.Thread.Sleep(5000);
+                            //System.Threading.Thread.Sleep(5000); 
                             break;
                     }
                 } while (!pet.Game_Over());
